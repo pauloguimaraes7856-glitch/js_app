@@ -1,0 +1,67 @@
+import {
+    getAllUsersService,
+    getUserByIdService,
+    createUserService,
+    updateUserService,
+    deleteUserService
+} from "../services/userService.js"
+
+export const getAllUsers = (req, res) => {
+    try {
+        const users = getAllUsersService()
+        res.status(200).json(users)
+    } catch (error) {
+        res.status(500).json({ message: error.message })
+    }
+}
+
+export const getUserById = (req, res) => {
+    try {
+        const { id } = req.params
+        const user = getUserByIdService(id)
+
+        if (!user) return res.status(404).json({ message: "User not found" })
+
+        res.status(200).json(user)
+    } catch (error) {
+        res.status(500).json({ message: error.message })
+    }
+}
+
+export const createUser = (req, res) => {
+    try {
+        const { name } = req.body
+        if (!name) return res.status(400).json({ message: "Name is required" })
+
+        const newUser = createUserService({ name })
+        res.status(201).json(newUser)
+    } catch (error) {
+        res.status(500).json({ message: error.message })
+    }
+}
+
+export const updateUser = (req, res) => {
+    try {
+        const { id } = req.params
+        const user = updateUserService(id, req.body)
+
+        if (!user) return res.status(404).json({ message: "User not found" })
+
+        res.status(200).json(user)
+    } catch (error) {
+        res.status(500).json({ message: error.message })
+    }
+}
+
+export const deleteUser = (req, res) => {
+    try {
+        const { id } = req.params
+        const deleted = deleteUserService(id)
+
+        if (!deleted) return res.status(404).json({ message: "User not found" })
+
+        res.status(204).send()
+    } catch (error) {
+        res.status(500).json({ message: error.message })
+    }
+}
