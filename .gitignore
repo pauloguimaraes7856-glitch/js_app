@@ -1,8 +1,8 @@
 node_modules/
 .env
 
-# Database files
-*.sqlite
-*.sqlite3
-*.db
-!data/.gitkeep
+# Ignore ONLY the SQLite files, NOT the folder
+data/*.sqlite
+data/*.sqlite3
+data/*.db
+database.sqlite
