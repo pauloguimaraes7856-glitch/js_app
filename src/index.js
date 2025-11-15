@@ -1,33 +1,38 @@
-import express from "express"
-import config from "./config/config.js"
-import { initializeDatabase } from "./config/database.js"
-import { logMiddleware } from "./middleware/logger.js"
-import userRoutes from "./routes/userRoutes.js"
-import { validateApiKey } from "./middleware/apiKey.js"
+import express from "express";
+import config from "./config/config.js";
+import { initializeDatabase } from "./config/database.js";
+import { logMiddleware } from "./middleware/logger.js";
+import { validateApiKey } from "./middleware/apiKey.js";
+import userRoutes from "./routes/userRoutes.js";
 
-const app = express()
+const app = express();
 
-await initializeDatabase()
+await initializeDatabase();
 
-app.use(express.json())
-app.use(logMiddleware)
+app.use(express.json());
+app.use(logMiddleware);
+
+app.get("/healthz", (req, res) => {
+    res.status(200).send("OK");
+});
+
 
 app.get("/", (req, res) => {
     res.json({
         message: "Welcome to the API",
-        env: config.nodeEnv,
+        environment: config.nodeEnv,
         endpoints: {
             users: "/users"
         }
-    })
-})
+    });
+});
 
-app.use("/health", (req, res) => {
-    res.json({ status: "OK" })
-})
 
-app.use("/users", validateApiKey, userRoutes)
+app.use("/users", validateApiKey, userRoutes);
 
-app.listen(config.port, () => {
-    console.log(`Server running on http://localhost:${config.port}`)
-})
+
+const PORT = process.env.PORT || config.port;
+app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+});
+
