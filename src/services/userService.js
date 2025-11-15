@@ -1,43 +1,28 @@
-let users = [
-    { id: 1, name: "Alice" },
-    { id: 2, name: "Bob" },
-    { id: 3, name: "Charlie" },
-    { id: 4, name: "Dave" },
-]
+import User from '../models/User.js'
 
-export const getAllUsersService = () => {
-    return users
+export const getAllUsers = () => User.findAll()
+export const getUserById = (id) => User.findById(id)
+
+export const createUser = ({ name, email }) => {
+  if (email && User.emailExists(email)) {
+    throw new Error('Email already exists')
+  }
+  return User.create({ name, email })
 }
 
+export const updateUser = (id, { name, email }) => {
+  const existing = User.findById(id)
+  if (!existing) return null
 
-export const getUserByIdService = (id) => {
-    return users.find(u => u.id === parseInt(id))
+  if (email && email !== existing.email && User.emailExists(email, id)) {
+    throw new Error('Email already exists')
+  }
+
+  return User.update(id, { name, email })
 }
 
+export const deleteUser = (id) => User.delete(id)
 
-export const createUserService = (userData) => {
-    const newUser = {
-        id: users.length + 1,
-        name: userData.name
-    }
-    users.push(newUser)
-    return newUser
-}
+export const getUserByEmail = (email) => User.findByEmail(email)
 
-
-export const updateUserService = (id, userData) => {
-    const index = users.findIndex(u => u.id === parseInt(id))
-    if (index === -1) return null
-
-    users[index] = { ...users[index], ...userData }
-    return users[index]
-}
-
-
-export const deleteUserService = (id) => {
-    const index = users.findIndex(u => u.id === parseInt(id))
-    if (index === -1) return false
-
-    users.splice(index, 1)
-    return true
-}
+export const getUserCount = () => User.count()

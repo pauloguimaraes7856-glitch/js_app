@@ -1,10 +1,11 @@
 import {
-    getAllUsersService,
-    getUserByIdService,
-    createUserService,
-    updateUserService,
-    deleteUserService
+    getAllUsers as getAllUsersService,
+    getUserById as getUserByIdService,
+    createUser as createUserService,
+    updateUser as updateUserService,
+    deleteUser as deleteUserService
 } from "../services/userService.js"
+
 
 export const getAllUsers = (req, res) => {
     try {

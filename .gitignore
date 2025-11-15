@@ -1,3 +1,10 @@
 node_modules/
 .env
 
+# Database files
+*.sqlite
+*.sqlite3
+*.db
+
+# Ignore custom DB folder
+data/
