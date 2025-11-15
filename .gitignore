@@ -5,6 +5,4 @@ node_modules/
 *.sqlite
 *.sqlite3
 *.db
-
-# Ignore custom DB folder
-data/
+!data/.gitkeep
