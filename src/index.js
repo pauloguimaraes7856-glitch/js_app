@@ -11,6 +11,7 @@ const app = express();
 await initializeDatabase();
 
 app.use(express.json());
+app.use(express.static("public"));
 app.use(logMiddleware);
 
 app.get("/healthz", (req, res) => {
@@ -29,7 +30,7 @@ app.get("/", (req, res) => {
 });
 
 app.use("/users", validateApiKey, userRoutes);
-app.use("/cars", validateApiKey, carRoutes);
+app.use("/cars", carRoutes);
 
 const PORT = process.env.PORT || config.port;
 app.listen(PORT, () => {
