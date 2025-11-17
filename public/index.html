@@ -1,139 +1,120 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <title>REST API Dashboard</title>
+    <meta charset="UTF-8">
+    <title>REST API Display</title>
 
     <style>
         body {
-            font-family: "Segoe UI", Arial, sans-serif;
-            background: #f0f2f5;
-            margin: 0;
-            padding: 40px;
-        }
-
-        .container {
+            font-family: "Inter", Arial, sans-serif;
             max-width: 900px;
-            margin: auto;
-            background: white;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            margin: 40px auto;
+            background: #f0f2f5;
+            padding: 20px;
         }
 
-        h1 {
-            text-align: center;
-            margin-bottom: 40px;
+        h1.title {
             font-size: 32px;
-            color: #333;
+            text-align: center;
+            font-weight: 700;
+            color: #222;
+            margin-bottom: 40px;
         }
 
         h2 {
-            margin-top: 40px;
-            color: #444;
-        }
-
-        .section {
-            margin-bottom: 30px;
+            font-size: 22px;
+            color: #333;
+            margin-bottom: 12px;
         }
 
         .card {
-            background: #fafafa;
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            border: 1px solid #e2e2e2;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+            transition: 0.2s ease;
+        }
+
+        .card:hover {
+            box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+        }
+
+        .user {
             padding: 15px;
-            border-radius: 10px;
-            margin-top: 15px;
-            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            margin: 12px 0;
+            background: #fafbfe;
+            border: 1px solid #e7e9ee;
+            transition: 0.2s;
         }
 
-        .item {
-            padding: 12px;
-            border-bottom: 1px solid #ddd;
+        .user:hover {
+            background: #f0f3fa;
         }
 
-        .item:last-child {
-            border-bottom: none;
+        .user b {
+            font-size: 18px;
         }
 
-        .tag {
+        .car-tag {
             display: inline-block;
-            padding: 5px 10px;
             background: #007bff;
             color: white;
-            border-radius: 5px;
+            padding: 3px 10px;
+            border-radius: 6px;
             font-size: 12px;
-            margin-left: 10px;
+            margin-left: 8px;
         }
 
-        .empty {
+        .nocard {
             color: #777;
             font-style: italic;
         }
     </style>
 </head>
+
 <body>
 
-<div class="container">
-    <h1>REST API Dashboard</h1>
+<h1 class="title">REST API – Display</h1>
 
-    <div class="section">
-        <h2>Users</h2>
-        <div id="users" class="card">Loading users...</div>
-    </div>
-
-    <div class="section">
-        <h2>Cars</h2>
-        <div id="cars" class="card">Loading cars...</div>
-    </div>
-</div>
+<h2>Users & Cars</h2>
+<div id="users" class="card">Loading...</div>
 
 <script>
-    const API_URL = "https://js-app-lted.onrender.com";
+    const API_URL = "http://localhost:3000";
     const API_KEY = "1234";
 
     async function loadUsers() {
         const res = await fetch(`${API_URL}/users`, {
             headers: { "x-api-key": API_KEY }
         });
+
         const data = await res.json();
 
         let html = "";
-        if (data.length === 0) {
-            html = '<div class="empty">No users found.</div>';
-        } else {
-            data.forEach(u => {
-                html += `<div class="item">
-                    <strong>${u.name}</strong>  
-                    <span class="tag">ID: ${u.id}</span><br>
-                    ${u.email || "<i>No email</i>"}<br>
-                    ${u.car_id ? `<b>Car:</b> ${u.car_id}` : "<i>No car assigned</i>"}
-                </div>`;
-            });
-        }
+        data.forEach(u => {
+            html += `
+                <div class="user">
+                    <b>${u.name}</b>
+                    <span class="car-tag">ID: ${u.id}</span><br>
+                    <div>${u.email}</div>
+                    <div style="margin-top:6px;">
+                        <i>Car:</i> ${
+                            u.brand
+                                ? `<b>${u.brand} ${u.model}</b> (${u.year})`
+                                : `<span class="nocard">No car assigned</span>`
+                        }
+                    </div>
+                </div>
+            `;
+        });
 
         document.getElementById("users").innerHTML = html;
     }
 
-    async function loadCars() {
-        const res = await fetch(`${API_URL}/cars`);
-        const data = await res.json();
-
-        let html = "";
-        if (data.length === 0) {
-            html = '<div class="empty">No cars found.</div>';
-        } else {
-            data.forEach(c => {
-                html += `<div class="item">
-                    <strong>${c.brand} ${c.model}</strong>  
-                    <span class="tag">Year: ${c.year}</span>
-                </div>`;
-            });
-        }
-
-        document.getElementById("cars").innerHTML = html;
-    }
-
     loadUsers();
-    loadCars();
 </script>
 
 </body>
