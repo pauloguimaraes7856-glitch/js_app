@@ -12,6 +12,10 @@ export const createUser = (data) => {
     return User.create(data);
 };
 
+export const createUsersBulk = (users) => {
+    return User.insertMany(users);
+};
+
 export const updateUser = (id, data) => {
     return User.update(id, data);
 };

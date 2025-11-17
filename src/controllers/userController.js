@@ -3,7 +3,8 @@ import {
     getUserById as getUserByIdService,
     createUser as createUserService,
     updateUser as updateUserService,
-    deleteUser as deleteUserService
+    deleteUser as deleteUserService,
+    createUsersBulk as createUsersBulkService
 } from "../services/userService.js";
 
 export const getAllUsers = (req, res) => {
@@ -29,6 +30,21 @@ export const createUser = (req, res) => {
     try {
         const newUser = createUserService(req.body);
         res.status(201).json(newUser);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+export const createUsersBulk = (req, res) => {
+    try {
+        const users = req.body;
+
+        if (!Array.isArray(users)) {
+            return res.status(400).json({ message: "Body must be an array" });
+        }
+
+        const count = createUsersBulkService(users);
+        res.status(201).json({ inserted: count });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }

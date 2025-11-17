@@ -3,7 +3,6 @@ import { getDb } from "../config/database.js";
 class User {
     static tableName = "users";
 
-
     static createTable() {
         const db = getDb();
         db.exec(`
@@ -18,7 +17,6 @@ class User {
             );
         `);
     }
-
 
     static seed() {
         const db = getDb();
@@ -35,7 +33,6 @@ class User {
         }
     }
 
-
     static findAll() {
         const db = getDb();
         return db.prepare(`
@@ -45,7 +42,6 @@ class User {
             ORDER BY users.id ASC
         `).all();
     }
-
 
     static findById(id) {
         const db = getDb();
@@ -57,7 +53,6 @@ class User {
         `).get(id);
     }
 
- 
     static create({ name, email, car_id = null }) {
         const db = getDb();
 
@@ -70,6 +65,23 @@ class User {
         return this.findById(result.lastInsertRowid);
     }
 
+    static insertMany(users) {
+        const db = getDb();
+
+        const stmt = db.prepare(`
+            INSERT INTO users (name, email, car_id)
+            VALUES (?, ?, ?)
+        `);
+
+        const insertMany = db.transaction((list) => {
+            for (const u of list) {
+                stmt.run(u.name, u.email || null, u.car_id || null);
+            }
+            return list.length;
+        });
+
+        return insertMany(users);
+    }
 
     static update(id, { name, email, car_id }) {
         const db = getDb();
@@ -82,7 +94,6 @@ class User {
 
         return this.findById(id);
     }
-
 
     static delete(id) {
         const db = getDb();
