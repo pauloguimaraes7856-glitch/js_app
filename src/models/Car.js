@@ -24,11 +24,6 @@ class Car {
             stmt.run("Toyota", "Supra", 2020);
         }
     }
-
-    static findAll() {
-        const db = getDb();
-        return db.prepare("SELECT * FROM cars ORDER BY id").all();
-    }
 }
 
 export default Car;
