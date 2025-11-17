@@ -1,35 +1,27 @@
-import Database from "better-sqlite3"
-import path from "path"
-import { fileURLToPath } from "url"
-import config from "./config.js"
+import Database from "better-sqlite3";
+import config from "./config.js";
+import fs from "fs";
 
-const __filename = fileURLToPath(import.meta.url)
-const __dirname = path.dirname(__filename)
-
-let dbPath
-
-if (path.isAbsolute(config.databaseUrl)) {
-    dbPath = config.databaseUrl
-} else {
-    dbPath = path.join(__dirname, "../../", config.databaseUrl)
-}
-
-console.log("DB path:", dbPath)
-
-const db = new Database(dbPath)
-db.pragma("foreign_keys = ON")
+let db;
 
 export const initializeDatabase = async () => {
-    console.log("Initializing database...")
+    const dbPath = config.databaseUrl;
 
-    const User = (await import("../models/User.js")).default
-    User.createTable()
-
-    if (config.isDevelopment()) {
-        User.seed()
+    const folder = dbPath.substring(0, dbPath.lastIndexOf("/"));
+    if (!fs.existsSync(folder)) {
+        fs.mkdirSync(folder, { recursive: true });
     }
 
-    console.log("Database initialization complete")
-}
+    db = new Database(dbPath);
 
-export default db
+    const User = (await import("../models/User.js")).default;
+    const Car = (await import("../models/Car.js")).default;
+
+    User.createTable();
+    User.seed();
+
+    Car.createTable();
+    Car.seed();
+};
+
+export default db;
