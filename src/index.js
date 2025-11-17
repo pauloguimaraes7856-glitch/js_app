@@ -29,7 +29,6 @@ app.get("/", (req, res) => {
     });
 });
 
-// ON PROTÈGE AUSSI LES CARS
 app.use("/users", validateApiKey, userRoutes);
 app.use("/cars", validateApiKey, carRoutes);
 
