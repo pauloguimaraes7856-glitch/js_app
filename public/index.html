@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>REST API Display</title>
+    <title>AutoNova Motors – REST API Display</title>
 
     <style>
         body {
@@ -18,7 +18,14 @@
             text-align: center;
             font-weight: 700;
             color: #222;
-            margin-bottom: 40px;
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 32px;
         }
 
         h2 {
@@ -77,9 +84,12 @@
 
 <body>
 
-<h1 class="title">REST API – Display</h1>
+<h1 class="title">AutoNova Motors – Client & Vehicle Dashboard</h1>
+<p class="subtitle">
+    Internal REST API used by AutoNova Motors to list customers and their vehicles.
+</p>
 
-<h2>Users & Cars</h2>
+<h2>Customers & Cars</h2>
 <div id="users" class="card">Loading...</div>
 
 <script>
@@ -87,31 +97,49 @@
     const API_KEY = "1234";
 
     async function loadUsers() {
-        const res = await fetch(`${API_URL}/users`, {
-            headers: { "x-api-key": API_KEY }
-        });
+        try {
+            const res = await fetch(`${API_URL}/users`, {
+                headers: { "x-api-key": API_KEY }
+            });
 
-        const data = await res.json();
+            if (!res.ok) {
+                document.getElementById("users").innerHTML =
+                    `<div class="nocard">Error loading data (status ${res.status}).</div>`;
+                return;
+            }
 
-        let html = "";
-        data.forEach(u => {
-            html += `
-                <div class="user">
-                    <b>${u.name}</b>
-                    <span class="car-tag">ID: ${u.id}</span><br>
-                    <div>${u.email}</div>
-                    <div style="margin-top:6px;">
-                        <i>Car:</i> ${
-                            u.brand
-                                ? `<b>${u.brand} ${u.model}</b> (${u.year})`
-                                : `<span class="nocard">No car assigned</span>`
-                        }
+            const data = await res.json();
+
+            if (!Array.isArray(data) || data.length === 0) {
+                document.getElementById("users").innerHTML =
+                    `<div class="nocard">No customers found.</div>`;
+                return;
+            }
+
+            let html = "";
+            data.forEach(u => {
+                html += `
+                    <div class="user">
+                        <b>${u.name}</b>
+                        <span class="car-tag">ID: ${u.id}</span><br>
+                        <div>${u.email}</div>
+                        <div style="margin-top:6px;">
+                            <i>Car:</i>
+                            ${
+                                u.brand
+                                    ? `<b>${u.brand} ${u.model}</b> (${u.year})`
+                                    : `<span class="nocard">No car assigned</span>`
+                            }
+                        </div>
                     </div>
-                </div>
-            `;
-        });
+                `;
+            });
 
-        document.getElementById("users").innerHTML = html;
+            document.getElementById("users").innerHTML = html;
+        } catch (err) {
+            document.getElementById("users").innerHTML =
+                `<div class="nocard">Error loading data: ${err.message}</div>`;
+        }
     }
 
     loadUsers();
