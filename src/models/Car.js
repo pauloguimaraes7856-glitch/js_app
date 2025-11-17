@@ -1,7 +1,8 @@
-import db from "../config/database.js";
+import { getDb } from "../config/database.js";
 
 class Car {
     static createTable() {
+        const db = getDb();
         db.prepare(`
             CREATE TABLE IF NOT EXISTS cars (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -13,7 +14,9 @@ class Car {
     }
 
     static seed() {
+        const db = getDb();
         const count = db.prepare("SELECT COUNT(*) AS total FROM cars").get().total;
+
         if (count === 0) {
             const stmt = db.prepare("INSERT INTO cars (brand, model, year) VALUES (?, ?, ?)");
             stmt.run("Tesla", "Model S", 2022);
@@ -23,6 +26,7 @@ class Car {
     }
 
     static findAll() {
+        const db = getDb();
         return db.prepare("SELECT * FROM cars ORDER BY id").all();
     }
 }
