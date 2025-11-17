@@ -5,11 +5,12 @@ import { logMiddleware } from "./middleware/logger.js";
 import { validateApiKey } from "./middleware/apiKey.js";
 import userRoutes from "./routes/userRoutes.js";
 import carRoutes from "./routes/carRoutes.js";
+import cors from "cors";
 
 const app = express();
 
 await initializeDatabase();
-
+app.use(cors());
 app.use(express.json());
 app.use(express.static("public"));
 app.use(logMiddleware);
