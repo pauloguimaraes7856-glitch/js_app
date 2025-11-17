@@ -9,5 +9,5 @@ router.get("/:id", validateApiKey, carController.getCarById);
 router.post("/", validateApiKey, carController.createCar);
 router.put("/:id", validateApiKey, carController.updateCar);
 router.delete("/:id", validateApiKey, carController.deleteCar);
-
+router.post("/bulk", carController.bulkInsertCars);
 export default router;

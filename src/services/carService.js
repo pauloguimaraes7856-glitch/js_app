@@ -31,3 +31,23 @@ export const deleteCar = (id) => {
     const db = getDb();
     return db.prepare("DELETE FROM cars WHERE id = ?").run(id);
 };
+
+
+export const bulkInsertCars = (carsArray) => {
+    const db = getDb();
+    const stmt = db.prepare(
+        "INSERT INTO cars (brand, model, year) VALUES (?, ?, ?)"
+    );
+
+    let count = 0;
+
+    const insertMany = db.transaction((cars) => {
+        cars.forEach(c => {
+            stmt.run(c.brand, c.model, c.year);
+            count++;
+        });
+    });
+
+    insertMany(carsArray);
+    return count;
+};

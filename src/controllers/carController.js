@@ -24,3 +24,13 @@ export const deleteCar = (req, res) => {
     carService.deleteCar(req.params.id);
     res.json({ message: "Car deleted" });
 };
+
+
+export const bulkInsertCars = (req, res) => {
+    try {
+        const inserted = carService.bulkInsertCars(req.body);
+        res.status(201).json({ inserted });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+};
