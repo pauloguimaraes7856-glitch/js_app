@@ -6,7 +6,6 @@ import {
     deleteUser as deleteUserService
 } from "../services/userService.js"
 
-
 export const getAllUsers = (req, res) => {
     try {
         const users = getAllUsersService()
@@ -31,10 +30,10 @@ export const getUserById = (req, res) => {
 
 export const createUser = (req, res) => {
     try {
-        const { name } = req.body
+        const { name, email } = req.body
         if (!name) return res.status(400).json({ message: "Name is required" })
 
-        const newUser = createUserService({ name })
+        const newUser = createUserService({ name, email })
         res.status(201).json(newUser)
     } catch (error) {
         res.status(500).json({ message: error.message })

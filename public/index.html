@@ -2,111 +2,77 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>My REST API Frontend</title>
+    <title>REST API Frontend</title>
 
     <style>
         body {
             font-family: Arial, sans-serif;
-            max-width: 800px;
+            max-width: 700px;
             margin: 40px auto;
             padding: 20px;
         }
-        h1 { font-size: 32px; margin-bottom: 20px; }
+
+        h1 { font-size: 28px; }
         h2 { margin-top: 40px; }
-        button {
-            padding: 10px 20px;
-            margin-top: 10px;
-            cursor: pointer;
-            background: #000;
-            color: white;
-            border: none;
+
+        .box {
+            background: #f5f5f5;
+            padding: 15px;
             border-radius: 6px;
+            margin-top: 10px;
         }
-        input {
-            padding: 10px;
-            width: 200px;
-            margin-right: 10px;
-        }
-        #output {
-            margin-top: 30px;
-            padding: 20px;
-            border: 1px solid #aaa;
-            background: #fafafa;
-            white-space: pre-wrap;
+
+        .item {
+            padding: 6px 0;
+            border-bottom: 1px solid #ddd;
         }
     </style>
 </head>
 
 <body>
 
-<h1>My REST API Frontend</h1>
+<h1>REST API – Display</h1>
 
-<h2>Get Users</h2>
-<button id="btnUsers">Load Users</button>
+<h2>Users</h2>
+<div id="users" class="box">Loading users...</div>
 
-<h2>Add User</h2>
-<input id="name" placeholder="name">
-<input id="email" placeholder="email">
-<button id="btnAddUser">Add User</button>
-
-<h2>Get Cars</h2>
-<button id="btnCars">Load Cars</button>
-
-<h2>Output</h2>
-<div id="output">Waiting...</div>
+<h2>Cars</h2>
+<div id="cars" class="box">Loading cars...</div>
 
 <script>
-    
     const API_URL = "https://js-app-lted.onrender.com";
     const API_KEY = "1234";
 
-    const out = msg =>
-        document.getElementById("output").textContent =
-            JSON.stringify(msg, null, 2);
+    async function loadUsers() {
+        const res = await fetch(`${API_URL}/users`, {
+            headers: { "x-api-key": API_KEY }
+        });
+        const data = await res.json();
 
+        let html = "";
+        data.forEach(u => {
+            html += `<div class="item">${u.name} — ${u.email}</div>`;
+        });
 
-    document.getElementById("btnUsers").onclick = async () => {
-        try {
-            const res = await fetch(`${API_URL}/users`, {
-                headers: { "x-api-key": API_KEY }
-            });
-            out(await res.json());
-        } catch (err) {
-            out(err);
-        }
-    };
+        document.getElementById("users").innerHTML = html || "No users found.";
+    }
 
-  
-    document.getElementById("btnAddUser").onclick = async () => {
-        const name = document.getElementById("name").value;
-        const email = document.getElementById("email").value;
+    async function loadCars() {
+        const res = await fetch(`${API_URL}/cars`, {
+            headers: { "x-api-key": API_KEY }
+        });
+        const data = await res.json();
 
-        try {
-            const res = await fetch(`${API_URL}/users`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "x-api-key": API_KEY
-                },
-                body: JSON.stringify({ name, email })
-            });
-            out(await res.json());
-        } catch (err) {
-            out(err);
-        }
-    };
+        let html = "";
+        data.forEach(c => {
+            html += `<div class="item">${c.brand} ${c.model} (${c.year})</div>`;
+        });
 
+        document.getElementById("cars").innerHTML = html || "No cars found.";
+    }
 
-    document.getElementById("btnCars").onclick = async () => {
-        try {
-            const res = await fetch(`${API_URL}/cars`, {
-                headers: { "x-api-key": API_KEY }
-            });
-            out(await res.json());
-        } catch (err) {
-            out(err);
-        }
-    };
+    loadUsers();
+    loadCars();
 </script>
 
 </body>

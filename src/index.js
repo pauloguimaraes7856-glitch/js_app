@@ -30,7 +30,7 @@ app.get("/", (req, res) => {
 });
 
 app.use("/users", validateApiKey, userRoutes);
-app.use("/cars", carRoutes);
+app.use("/cars", validateApiKey, carRoutes);
 
 const PORT = process.env.PORT || config.port;
 app.listen(PORT, () => {
