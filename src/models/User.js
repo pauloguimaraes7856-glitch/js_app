@@ -1,52 +1,48 @@
 import { getDb } from "../config/database.js";
 
 class User {
-    static tableName = "users";
-
     static createTable() {
         const db = getDb();
-        db.exec(`
+        db.prepare(`
             CREATE TABLE IF NOT EXISTS users (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 name TEXT NOT NULL,
-                email TEXT UNIQUE,
-                created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-                updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+                email TEXT,
+                car_id INTEGER,
+                FOREIGN KEY (car_id) REFERENCES cars(id)
             )
-        `);
-    }
-
-    static findAll() {
-        const db = getDb();
-        return db.prepare("SELECT * FROM users ORDER BY id").all();
-    }
-
-    static findById(id) {
-        const db = getDb();
-        return db.prepare("SELECT * FROM users WHERE id = ?").get(id);
-    }
-
-    static create(data) {
-        const db = getDb();
-        const stmt = db.prepare("INSERT INTO users (name, email) VALUES (?, ?)");
-        const info = stmt.run(data.name, data.email || null);
-        return this.findById(info.lastInsertRowid);
-    }
-
-    static delete(id) {
-        const db = getDb();
-        const stmt = db.prepare("DELETE FROM users WHERE id = ?");
-        return stmt.run(id).changes > 0;
+        `).run();
     }
 
     static seed() {
         const db = getDb();
         const count = db.prepare("SELECT COUNT(*) AS total FROM users").get().total;
+
         if (count === 0) {
-            ["Alice", "Bob", "Charlie"].forEach(name => {
-                this.create({ name, email: `${name.toLowerCase()}@test.com` });
-            });
+            const stmt = db.prepare(`
+                INSERT INTO users (name, email, car_id) VALUES (?, ?, ?)
+            `);
+
+            stmt.run("Alice", "alice@test.com", 1);   // Tesla
+            stmt.run("Bob", "bob@test.com", 2);       // BMW
+            stmt.run("Charlie", "charlie@test.com", 3); // Supra
         }
+    }
+
+    static findAllWithCars() {
+        const db = getDb();
+        return db.prepare(`
+            SELECT 
+                users.id,
+                users.name,
+                users.email,
+                cars.brand,
+                cars.model,
+                cars.year
+            FROM users
+            LEFT JOIN cars ON users.car_id = cars.id
+            ORDER BY users.id
+        `).all();
     }
 }
 
