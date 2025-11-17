@@ -1,10 +1,11 @@
-import db from "../config/database.js";
+import { getDb } from "../config/database.js";
 
 class User {
     static tableName = "users";
 
     static createTable() {
-        const sql = `
+        const db = getDb();
+        db.exec(`
             CREATE TABLE IF NOT EXISTS users (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 name TEXT NOT NULL,
@@ -13,51 +14,27 @@ class User {
                 created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
                 updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
                 FOREIGN KEY (car_id) REFERENCES cars(id)
-            )
-        `;
-        db.exec(sql);
+            );
+        `);
+    }
+
+    static seed() {
+        const db = getDb();
+        const count = db.prepare(`SELECT COUNT(*) as c FROM users`).get().c;
+        if (count === 0) {
+            const stmt = db.prepare(`INSERT INTO users (name, email, car_id) VALUES (?, ?, ?)`);
+            stmt.run("Alice", "alice@test.com", 1);
+            stmt.run("Bob", "bob@test.com", 2);
+            stmt.run("Charlie", "charlie@test.com", null);
+        }
     }
 
     static findAll() {
+        const db = getDb();
         return db.prepare(`
             SELECT users.*, cars.brand, cars.model, cars.year
-            FROM users
-            LEFT JOIN cars ON users.car_id = cars.id
-            ORDER BY users.id
+            FROM users LEFT JOIN cars ON users.car_id = cars.id
         `).all();
-    }
-
-    static findById(id) {
-        return db.prepare(`
-            SELECT users.*, cars.brand, cars.model, cars.year
-            FROM users
-            LEFT JOIN cars ON users.car_id = cars.id
-            WHERE users.id = ?
-        `).get(id);
-    }
-
-    static create(data) {
-        const stmt = db.prepare(`
-            INSERT INTO users (name, email, car_id)
-            VALUES (?, ?, ?)
-        `);
-        const result = stmt.run(data.name, data.email || null, data.car_id || null);
-        return this.findById(result.lastInsertRowid);
-    }
-
-    static update(id, data) {
-        const stmt = db.prepare(`
-            UPDATE users
-            SET name = ?, email = ?, car_id = ?, updated_at = CURRENT_TIMESTAMP
-            WHERE id = ?
-        `);
-        stmt.run(data.name, data.email, data.car_id, id);
-
-        return this.findById(id);
-    }
-
-    static delete(id) {
-        return db.prepare(`DELETE FROM users WHERE id = ?`).run(id).changes > 0;
     }
 }
 

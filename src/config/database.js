@@ -4,6 +4,9 @@ import fs from "fs";
 
 let db = null;
 
+
+export const getDb = () => db;
+
 export const initializeDatabase = async () => {
     const dbPath = config.databaseUrl;
 
@@ -13,23 +16,21 @@ export const initializeDatabase = async () => {
         fs.mkdirSync(folder, { recursive: true });
     }
 
- 
-    db = new Database(dbPath);
 
+    db = new Database(dbPath);
     console.log("📁 Database initialized at:", dbPath);
 
 
     const User = (await import("../models/User.js")).default;
     const Car = (await import("../models/Car.js")).default;
 
-    User.createTable();
-    User.seed();
 
+    User.createTable();
     Car.createTable();
+
+
+    User.seed();
     Car.seed();
 };
-
-
-export const getDb = () => db;
 
 export default db;
