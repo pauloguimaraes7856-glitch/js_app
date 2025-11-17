@@ -1,21 +1,19 @@
 import Database from "better-sqlite3";
-import fs from "fs";
-import path from "path";
 import config from "./config.js";
+import fs from "fs";
 
 let db;
 
 export const initializeDatabase = async () => {
-    const folder = path.resolve("data");
-    const dbPath = path.join(folder, "database.sqlite");
+    const dbPath = config.databaseUrl;
 
+    const folder = dbPath.substring(0, dbPath.lastIndexOf("/"));
     if (!fs.existsSync(folder)) {
         fs.mkdirSync(folder, { recursive: true });
     }
 
     db = new Database(dbPath);
 
-    // Load models after DB is created
     const User = (await import("../models/User.js")).default;
     const Car = (await import("../models/Car.js")).default;
 
@@ -25,5 +23,7 @@ export const initializeDatabase = async () => {
     Car.createTable();
     Car.seed();
 };
+
+export const getDb = () => db;
 
 export default db;

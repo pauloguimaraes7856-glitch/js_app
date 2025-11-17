@@ -14,9 +14,7 @@ app.use(express.json());
 app.use(express.static("public"));
 app.use(logMiddleware);
 
-app.get("/healthz", (req, res) => {
-    res.status(200).send("OK");
-});
+app.get("/healthz", (req, res) => res.send("OK"));
 
 app.get("/", (req, res) => {
     res.json({
@@ -32,7 +30,6 @@ app.get("/", (req, res) => {
 app.use("/users", validateApiKey, userRoutes);
 app.use("/cars", validateApiKey, carRoutes);
 
-const PORT = process.env.PORT || config.port;
-app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-});
+app.listen(config.port, () =>
+    console.log(`Server running on port ${config.port}`)
+);
