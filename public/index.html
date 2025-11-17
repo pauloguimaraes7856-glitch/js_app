@@ -40,16 +40,13 @@
 <div id="cars" class="box">Loading cars...</div>
 
 <script>
-
     const API_URL = "http://localhost:3000";
-    const API_KEY = "1234";   // <---- LA CLÉ API COMMUNIQUE ENFIN !
+    const API_KEY = "1234";
 
     async function loadUsers() {
         try {
             const res = await fetch(`${API_URL}/users`, {
-                headers: {
-                    "x-api-key": API_KEY
-                }
+                headers: { "x-api-key": API_KEY }
             });
             const data = await res.json();
 
@@ -67,9 +64,7 @@
     async function loadCars() {
         try {
             const res = await fetch(`${API_URL}/cars`, {
-                headers: {
-                    "x-api-key": API_KEY
-                }
+                headers: { "x-api-key": API_KEY }
             });
             const data = await res.json();
 
@@ -86,7 +81,6 @@
 
     loadUsers();
     loadCars();
-
 </script>
 
 </body>
