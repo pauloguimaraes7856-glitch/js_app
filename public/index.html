@@ -1,69 +1,139 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>REST API Display</title>
+    <meta charset="UTF-8" />
+    <title>REST API Dashboard</title>
 
     <style>
         body {
-            font-family: Arial, sans-serif;
-            max-width: 800px;
-            margin: 40px auto;
+            font-family: "Segoe UI", Arial, sans-serif;
+            background: #f0f2f5;
+            margin: 0;
+            padding: 40px;
         }
+
+        .container {
+            max-width: 900px;
+            margin: auto;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 40px;
+            font-size: 32px;
+            color: #333;
+        }
+
+        h2 {
+            margin-top: 40px;
+            color: #444;
+        }
+
+        .section {
+            margin-bottom: 30px;
+        }
+
         .card {
-            background: #f4f4f4;
+            background: #fafafa;
             padding: 15px;
-            margin-bottom: 15px;
-            border-radius: 6px;
+            border-radius: 10px;
+            margin-top: 15px;
+            border: 1px solid #e0e0e0;
         }
-        .title {
-            font-size: 24px;
-            margin-bottom: 20px;
-            font-weight: bold;
-        }
-        .user {
-            padding: 10px 0;
+
+        .item {
+            padding: 12px;
             border-bottom: 1px solid #ddd;
+        }
+
+        .item:last-child {
+            border-bottom: none;
+        }
+
+        .tag {
+            display: inline-block;
+            padding: 5px 10px;
+            background: #007bff;
+            color: white;
+            border-radius: 5px;
+            font-size: 12px;
+            margin-left: 10px;
+        }
+
+        .empty {
+            color: #777;
+            font-style: italic;
         }
     </style>
 </head>
-
 <body>
 
-<h1 class="title">REST API – Display</h1>
+<div class="container">
+    <h1>REST API Dashboard</h1>
 
-<h2>Users & Cars</h2>
-<div id="users" class="card">Loading...</div>
+    <div class="section">
+        <h2>Users</h2>
+        <div id="users" class="card">Loading users...</div>
+    </div>
+
+    <div class="section">
+        <h2>Cars</h2>
+        <div id="cars" class="card">Loading cars...</div>
+    </div>
+</div>
 
 <script>
-    const API_URL = "http://localhost:3000";
+    const API_URL = "https://js-app-lted.onrender.com";
     const API_KEY = "1234";
 
     async function loadUsers() {
         const res = await fetch(`${API_URL}/users`, {
             headers: { "x-api-key": API_KEY }
         });
-
         const data = await res.json();
 
         let html = "";
-        data.forEach(u => {
-            html += `
-                <div class="user">
-                    <b>${u.name}</b> — ${u.email}<br>
-                    <i>Car:</i> ${
-                        u.brand
-                            ? `${u.brand} ${u.model} (${u.year})`
-                            : "No car assigned"
-                    }
-                </div>
-            `;
-        });
+        if (data.length === 0) {
+            html = '<div class="empty">No users found.</div>';
+        } else {
+            data.forEach(u => {
+                html += `<div class="item">
+                    <strong>${u.name}</strong>  
+                    <span class="tag">ID: ${u.id}</span><br>
+                    ${u.email || "<i>No email</i>"}<br>
+                    ${u.car_id ? `<b>Car:</b> ${u.car_id}` : "<i>No car assigned</i>"}
+                </div>`;
+            });
+        }
 
         document.getElementById("users").innerHTML = html;
     }
 
+    async function loadCars() {
+        const res = await fetch(`${API_URL}/cars`);
+        const data = await res.json();
+
+        let html = "";
+        if (data.length === 0) {
+            html = '<div class="empty">No cars found.</div>';
+        } else {
+            data.forEach(c => {
+                html += `<div class="item">
+                    <strong>${c.brand} ${c.model}</strong>  
+                    <span class="tag">Year: ${c.year}</span>
+                </div>`;
+            });
+        }
+
+        document.getElementById("cars").innerHTML = html;
+    }
+
     loadUsers();
+    loadCars();
 </script>
 
 </body>
